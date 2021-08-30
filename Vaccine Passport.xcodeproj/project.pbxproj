@@ -7,15 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		612BDD0D26DAD74A0030CD60 /* PaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 612BDD0C26DAD74A0030CD60 /* PaddingLabel.swift */; };
+		612BDD1126DB00240030CD60 /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 612BDD1026DB00240030CD60 /* InfoViewController.swift */; };
+		612BDD1326DBAAA30030CD60 /* PassportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 612BDD1226DBAAA20030CD60 /* PassportViewController.swift */; };
+		612BDD1526DBCB4E0030CD60 /* VaccineInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 612BDD1426DBCB4E0030CD60 /* VaccineInfoViewController.swift */; };
 		6181293626D90F7F0047A12F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6181293526D90F7F0047A12F /* AppDelegate.swift */; };
 		6181293826D90F7F0047A12F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6181293726D90F7F0047A12F /* SceneDelegate.swift */; };
 		6181293A26D90F7F0047A12F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6181293926D90F7F0047A12F /* ViewController.swift */; };
 		6181293D26D90F7F0047A12F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6181293B26D90F7F0047A12F /* Main.storyboard */; };
 		6181293F26D90F850047A12F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6181293E26D90F850047A12F /* Assets.xcassets */; };
 		6181294226D90F850047A12F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6181294026D90F850047A12F /* LaunchScreen.storyboard */; };
+		6181294A26D9708F0047A12F /* ScanQRViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6181294926D9708F0047A12F /* ScanQRViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		612BDD0C26DAD74A0030CD60 /* PaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddingLabel.swift; sourceTree = "<group>"; };
+		612BDD1026DB00240030CD60 /* InfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoViewController.swift; sourceTree = "<group>"; };
+		612BDD1226DBAAA20030CD60 /* PassportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassportViewController.swift; sourceTree = "<group>"; };
+		612BDD1426DBCB4E0030CD60 /* VaccineInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaccineInfoViewController.swift; sourceTree = "<group>"; };
 		6181293226D90F7F0047A12F /* Vaccine Passport.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Vaccine Passport.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6181293526D90F7F0047A12F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6181293726D90F7F0047A12F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -24,6 +33,7 @@
 		6181293E26D90F850047A12F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6181294126D90F850047A12F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6181294326D90F850047A12F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6181294926D9708F0047A12F /* ScanQRViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanQRViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,10 +69,15 @@
 				6181293526D90F7F0047A12F /* AppDelegate.swift */,
 				6181293726D90F7F0047A12F /* SceneDelegate.swift */,
 				6181293926D90F7F0047A12F /* ViewController.swift */,
+				612BDD0C26DAD74A0030CD60 /* PaddingLabel.swift */,
 				6181293B26D90F7F0047A12F /* Main.storyboard */,
+				6181294926D9708F0047A12F /* ScanQRViewController.swift */,
 				6181293E26D90F850047A12F /* Assets.xcassets */,
 				6181294026D90F850047A12F /* LaunchScreen.storyboard */,
+				612BDD1026DB00240030CD60 /* InfoViewController.swift */,
 				6181294326D90F850047A12F /* Info.plist */,
+				612BDD1426DBCB4E0030CD60 /* VaccineInfoViewController.swift */,
+				612BDD1226DBAAA20030CD60 /* PassportViewController.swift */,
 			);
 			path = "Vaccine Passport";
 			sourceTree = "<group>";
@@ -137,8 +152,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6181294A26D9708F0047A12F /* ScanQRViewController.swift in Sources */,
+				612BDD0D26DAD74A0030CD60 /* PaddingLabel.swift in Sources */,
 				6181293A26D90F7F0047A12F /* ViewController.swift in Sources */,
+				612BDD1326DBAAA30030CD60 /* PassportViewController.swift in Sources */,
 				6181293626D90F7F0047A12F /* AppDelegate.swift in Sources */,
+				612BDD1126DB00240030CD60 /* InfoViewController.swift in Sources */,
+				612BDD1526DBCB4E0030CD60 /* VaccineInfoViewController.swift in Sources */,
 				6181293826D90F7F0047A12F /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
