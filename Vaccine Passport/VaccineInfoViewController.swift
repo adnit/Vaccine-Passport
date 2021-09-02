@@ -10,7 +10,7 @@ import UIKit
 class VaccineInfoViewController: UIViewController {
 
     
-    var doza: Int?
+    var doza: Int? = nil
     @IBOutlet var blurEffectView: UIView!
     @IBOutlet weak var boxView: UIView!
     @IBOutlet weak var titleLbl: UILabel!
@@ -19,6 +19,24 @@ class VaccineInfoViewController: UIViewController {
     @IBOutlet weak var doctorLbl: UILabel!
     @IBOutlet weak var assistantLbl: UILabel!
     @IBOutlet weak var noteLbl: UILabel!
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(false)
+        
+        let reqDose = UserDefaults.standard.object(forKey: "doza")
+        
+        DispatchQueue.main.async {
+            self.titleLbl.text = "Doza \(reqDose ?? "-")"
+            let myarray = UserDefaults.standard.object(forKey: "dose\(reqDose ?? "0")") as? [String]
+            // Optional(["Pfizer", "FG3716", "2021-08-24", "Nuk ka", "Isidora Dobratiqi", "Adem Mexhuani"])
+            self.manufacturerLbl.text = myarray?[0] as Any as? String
+            self.serialNoLbl.text = myarray?[1] as Any as? String
+            self.doctorLbl.text = myarray?[4] as Any as? String
+            self.assistantLbl.text = myarray?[5] as Any as? String
+            self.noteLbl.text = myarray?[3] as Any as? String
+        }
+        
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -32,16 +50,6 @@ class VaccineInfoViewController: UIViewController {
         view.addSubview(blurEffectView)
         view.addSubview(boxView)
         
-        if doza == 1 {
-            titleLbl.text = "Doza 1"
-            let myarray = UserDefaults.standard.object(forKey: "dose1") as? [String]
-            // Optional(["Pfizer", "FG3716", "2021-08-24", "Nuk ka", "Isidora Dobratiqi", "Adem Mexhuani"])
-            manufacturerLbl.text = myarray?[0] as Any as? String
-            serialNoLbl.text = myarray?[1] as Any as? String
-            doctorLbl.text = myarray?[4] as Any as? String
-            assistantLbl.text = myarray?[5] as Any as? String
-            noteLbl.text = myarray?[3] as Any as? String
-        }
         
         
         // Do any additional setup after loading the view.

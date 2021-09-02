@@ -22,6 +22,7 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
     @IBOutlet weak var nameLbl: UILabel!
     @IBOutlet weak var surnameLbl: UILabel!
     
+    @IBOutlet weak var moreBtn: UIButton!
     @IBOutlet weak var spinningIndicator: UIActivityIndicatorView!
     @IBOutlet weak var doza1Btn: UIButton!
     @IBOutlet weak var doza2Btn: UIButton!
@@ -34,65 +35,119 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
     var previewLayer: AVCaptureVideoPreviewLayer!
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        exitIcon.isUserInteractionEnabled = true
+
+        
+        scanBtn.layer.cornerRadius = 7.0
         titleLblBtn.layer.cornerRadius = 10.0
         
         doza1Btn.layer.cornerRadius = 6.0
         doza2Btn.layer.cornerRadius = 5.0
         
-        captureSession = AVCaptureSession()
+        
+        
+        let userExists =  UserDefaults.standard.object(forKey: "nrpersonal") != nil
+        
+        if !userExists {
+            captureSession = AVCaptureSession()
 
-        guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else { return }
-        let videoInput: AVCaptureDeviceInput
+            guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else { return failed() }
+            let videoInput: AVCaptureDeviceInput
 
-        do {
-            videoInput = try AVCaptureDeviceInput(device: videoCaptureDevice)
-        } catch {
-            return
+            do {
+                videoInput = try AVCaptureDeviceInput(device: videoCaptureDevice)
+            } catch {
+                return
+            }
+
+            if (captureSession.canAddInput(videoInput)) {
+                captureSession.addInput(videoInput)
+            } else {
+                failed()
+                return
+            }
+
+            let metadataOutput = AVCaptureMetadataOutput()
+
+            if (captureSession.canAddOutput(metadataOutput)) {
+                captureSession.addOutput(metadataOutput)
+
+                metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
+                metadataOutput.metadataObjectTypes = [.qr]
+            } else {
+                failed()
+                return
+            }
+
+            previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
+            previewLayer.frame = view.layer.bounds
+            previewLayer.videoGravity = .resizeAspectFill
+            view.layer.addSublayer(previewLayer)
+            
+            captureSession.startRunning()
+            doza1Btn.isEnabled = false
+            doza2Btn.isEnabled = false
+            emriMbiemriBtn.isEnabled = false
+            self.view.bringSubviewToFront(scanBtn)
+            self.view.bringSubviewToFront(exitIcon)
+            exitIcon.layer.cornerRadius = 8.0
+            let interaction = UIContextMenuInteraction(delegate: self)
+            moreBtn.addInteraction(interaction)
+            
+            
+            // Do any additional setup after loading the view.
+            
+            
+        }else{
+            let interaction = UIContextMenuInteraction(delegate: self)
+            moreBtn.addInteraction(interaction)
+            let myarray = UserDefaults.standard.object(forKey: "dose1") as? [String]
+            DispatchQueue.main.async {
+                self.nameLbl.text = (UserDefaults.standard.object(forKey: "name") as! String)
+                self.surnameLbl.text = (UserDefaults.standard.object(forKey: "surname") as! String)
+                self.firstDoseLbl.text = myarray?[2] as Any as? String
+                self.scanBtn.isHidden = true
+                self.spinningIndicator.isHidden = true
+            }
+            
+            
+            if UserDefaults.standard.object(forKey: "dose2") != nil {
+                let myarray2 = UserDefaults.standard.object(forKey: "dose2") as? [String]
+                DispatchQueue.main.async {
+                    self.secondDoseLbl.text = myarray2?[2] as Any as? String
+                }
+            }else{
+                DispatchQueue.main.async {
+                    self.doza2Btn.isHidden = true
+                    self.secondDoseLbl.isHidden = true
+                }
+            }
         }
-
-        if (captureSession.canAddInput(videoInput)) {
-            captureSession.addInput(videoInput)
-        } else {
-            failed()
-            return
         }
-
-        let metadataOutput = AVCaptureMetadataOutput()
-
-        if (captureSession.canAddOutput(metadataOutput)) {
-            captureSession.addOutput(metadataOutput)
-
-            metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
-            metadataOutput.metadataObjectTypes = [.qr]
-        } else {
-            failed()
-            return
+        
+        
+    func openSettings(alert: UIAlertAction!) {
+        if let url = URL.init(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            self.dismiss(animated: true)
         }
-
-        previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-        previewLayer.frame = view.layer.bounds
-        previewLayer.videoGravity = .resizeAspectFill
-        view.layer.addSublayer(previewLayer)
-        
-        captureSession.startRunning()
-        doza1Btn.isEnabled = false
-        doza2Btn.isEnabled = false
-        emriMbiemriBtn.isEnabled = false
-        self.view.bringSubviewToFront(scanBtn)
-        self.view.bringSubviewToFront(exitIcon)
-        exitIcon.layer.cornerRadius = 8.0
-        
-        // Do any additional setup after loading the view.
-        
-        
     }
     
     func failed() {
-        
-        let ac = UIAlertController(title: "Scanning not supported", message: "Your device does not support scanning a code from an item. Please use a device with a camera.", preferredStyle: .alert)
-        ac.addAction(UIAlertAction(title: "OK", style: .default))
-        present(ac, animated: true)
         captureSession = nil
+        DispatchQueue.main.async {
+            self.hideError()
+            
+            let ac = UIAlertController(title: "Nuk mund te skanoni", message: "Per te skanuar duhet qasje ne kamere", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "Mbyll", style: .default, handler: {action in
+                self.dismiss(animated: true)
+            }))
+            ac.addAction(UIAlertAction(title: "Hap Settings", style: .default, handler: self.openSettings))
+            self.present(ac, animated: true)
+        }
+        
+       
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -181,6 +236,7 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
                     let birthdate = dob[..<dob.firstIndex(of: "T")!]
                     
                     if jsonArray.count == 2 {
+                        
                         let firstVac = jsonArray[jsonArray.count - 2]["date"] as! String
                         let vac1date = firstVac[..<firstVac.firstIndex(of: "T")!]
                         let secondVac = jsonArray[jsonArray.count - 1]["date"] as! String
@@ -194,6 +250,8 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
                         firstDose.append(jsonArray[0]["note"] as? String ?? "Nuk ka")
                         firstDose.append(jsonArray[0]["medicalStaff"] as! String)
                         firstDose.append(jsonArray[0]["assistantMedicalStaff"] as! String)
+                        
+                        
                         
                         var secondDose = [String]()
                         
@@ -211,6 +269,7 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
                             secondDoseLbl.text = String(vac2date)
                         }
                     }else if jsonArray.count == 1{
+                        
                         let firstVac = jsonArray[jsonArray.count - 1]["date"] as! String
                         let vac1date = firstVac[..<firstVac.firstIndex(of: "T")!]
                         
@@ -232,8 +291,7 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
                             firstDoseLbl.text = String(vac1date)
                         }
                     }
-                    let lastVaccination = jsonArray[jsonArray.count - 1]["date"] as! String
-                    let lastVac = lastVaccination[..<lastVaccination.firstIndex(of: "T")!]
+                    
 	
                     DispatchQueue.main.async {
                         doza1Btn.isEnabled = true
@@ -267,10 +325,7 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
                                                self.present(optionMenu, animated: true, completion: nil)
                         self.nameLbl.text = name
                         self.surnameLbl.text = surname
-                        
-                        
-                        
-                        self.firstDoseLbl.text = String(lastVac)
+ 
                     }
 
                     
@@ -286,18 +341,19 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
             task.resume()
         
     }
-    
-    var doza = 0
+    var doza = "0"
     
     @IBAction func firstDoseBtn(_ sender: UIButton) {
-        doza = 1
+        doza = "1"
+        UserDefaults.standard.set(doza, forKey: "doza")
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if let vacInfoView = segue.destination as? VaccineInfoViewController {
-            vacInfoView.doza = self.doza
-        }
+    @IBAction func secondDose(_ sender: UIButton) {
+        doza = "2"
+        UserDefaults.standard.set(doza, forKey: "doza")
     }
+
+
     
     func generateQRCode(from string: String) -> UIImage? {
         let data = string.data(using: String.Encoding.ascii)
@@ -317,6 +373,9 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
 
     func hideError(){
         DispatchQueue.main.async {
+            self.qrCodeImg.isHidden = true
+            self.nameLbl.isHidden = true
+            self.spinningIndicator.isHidden = true
             self.doza1Btn.isHidden = true
             self.doza2Btn.isHidden = true
             self.surnameLbl.isHidden = true
@@ -327,6 +386,8 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
         }
     }
 
+    
+   
     /*
     // MARK: - Navigation
 
@@ -338,3 +399,77 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
     */
 
 }
+
+extension PassportViewController: UIContextMenuInteractionDelegate {
+  func contextMenuInteraction(
+    _ interaction: UIContextMenuInteraction,
+    configurationForMenuAtLocation location: CGPoint)
+      -> UIContextMenuConfiguration? {
+    
+    func makeDeleteInfo() -> UIAction {
+      // 1
+        let removeRatingAttributes = UIMenuElement.Attributes.destructive
+
+      // 3
+      let trashImage = UIImage(systemName: "trash")
+      
+      // 4
+      return UIAction(
+        title: "Fshij informatat",
+        image: trashImage,
+        identifier: nil,
+        attributes: removeRatingAttributes,
+        handler: deleteInfo)
+    }
+    
+    func deleteInfo(from action: UIAction){
+        let domain = Bundle.main.bundleIdentifier!
+        UserDefaults.standard.removePersistentDomain(forName: domain)
+        UserDefaults.standard.synchronize()
+        dismiss(animated: true)
+    }
+    
+    func screenShotMenu() -> UIAction {
+    let shareImg = UIImage(systemName: "square.and.arrow.up")
+      
+      return UIAction(
+        title: "Shperndaj pasaporten",
+        image: shareImg,
+        identifier: nil,
+        handler: screenShot)
+    }
+    
+
+    func screenShot(from action: UIAction) {
+        //Set the default sharing message.
+            let message = "Pasaporta ime e vaksinimit"
+          
+            UIGraphicsBeginImageContextWithOptions(self.view.frame.size, true, 0.0)
+            self.view.drawHierarchy(in: self.view.frame, afterScreenUpdates: false)
+            let img = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+
+            //Set the link, message, image to share.
+            if let img = img {
+                let objectsToShare = [img, message] as [Any]
+                let activityVC = UIActivityViewController(activityItems: objectsToShare, applicationActivities: nil)
+                activityVC.excludedActivityTypes = [ UIActivity.ActivityType.addToReadingList]
+                self.present(activityVC, animated: true, completion: nil)
+            }
+    }
+    
+    
+    return UIContextMenuConfiguration(
+      identifier: nil,
+      previewProvider: nil,
+      actionProvider: { _ in
+        let delete = makeDeleteInfo()
+        let share = screenShotMenu()
+        let children = [delete, share]
+        return UIMenu(title: "Pasaporta e vaksinimit", children: children)
+    })
+  }
+    
+}
+
+

@@ -36,6 +36,7 @@ class ScanQRViewController: UIViewController, AVCaptureMetadataOutputObjectsDele
                 self.infoStackView.isHidden = true
             }
             
+            
             scanBtn.layer.cornerRadius = 7.0
                     
             scanBtn.layer.shadowColor = UIColor.black.cgColor
@@ -46,12 +47,13 @@ class ScanQRViewController: UIViewController, AVCaptureMetadataOutputObjectsDele
             
             captureSession = AVCaptureSession()
 
-            guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else { return }
+            guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else { return failed() }
             let videoInput: AVCaptureDeviceInput
 
             do {
                 videoInput = try AVCaptureDeviceInput(device: videoCaptureDevice)
             } catch {
+                failed()
                 return
             }
 
@@ -89,12 +91,30 @@ class ScanQRViewController: UIViewController, AVCaptureMetadataOutputObjectsDele
 func tapFunction(sender:UITapGestureRecognizer) {
     dismiss(animated: true)
 }
+    
+    func openSettings(alert: UIAlertAction!) {
+        if let url = URL.init(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            self.dismiss(animated: true)
+        }
+    }
         func failed() {
-            
-            let ac = UIAlertController(title: "Scanning not supported", message: "Your device does not support scanning a code from an item. Please use a device with a camera.", preferredStyle: .alert)
-            ac.addAction(UIAlertAction(title: "OK", style: .default))
-            present(ac, animated: true)
             captureSession = nil
+            DispatchQueue.main.async {
+                self.resultIcon.isHidden = true
+                self.vaksinuarLbl.isHidden = true
+                self.scanBtn.isHidden = true
+                self.spinningIndicator.isHidden = true
+                
+                let ac = UIAlertController(title: "Nuk mund te skanoni", message: "Per te skanuar duhet qasje ne kamere", preferredStyle: .alert)
+                ac.addAction(UIAlertAction(title: "Mbyll", style: .default, handler: {action in
+                    self.dismiss(animated: true)
+                }))
+                ac.addAction(UIAlertAction(title: "Hap Settings", style: .default, handler: self.openSettings))
+                self.present(ac, animated: true)
+            }
+            
+           
         }
 
         override func viewWillAppear(_ animated: Bool) {
@@ -188,10 +208,11 @@ func tapFunction(sender:UITapGestureRecognizer) {
                                    
                    
                         DispatchQueue.main.async {
-                            if jsonArray.count > 1{
-                                vaksinuarLbl.text = "Vaksinuar me " + String(jsonArray.count) + "doza"
+                            if jsonArray.count > 1 {
+                                vaksinuarLbl.text = "Vaksinuar me " + String(jsonArray.count) + " doza"
+                            }else{
+                                vaksinuarLbl.text = "Vaksinuar me 1 dozë"
                             }
-                            vaksinuarLbl.text = "Vaksinuar me 1 dozë"
                             nrPersonalLbl.text = nrPersonal
                             emriLbl.text = name + " " + surname
                             yearLbl.text = String(year)

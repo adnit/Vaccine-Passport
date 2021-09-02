@@ -13,9 +13,25 @@ class ViewController: UIViewController {
     @IBOutlet weak var loadBtn: UIButton!
     @IBOutlet weak var checkBtn: UIButton!
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        let passportExists =  UserDefaults.standard.object(forKey: "nrpersonal") != nil
+        if passportExists {
+            DispatchQueue.main.async {
+                self.loadBtn.setTitle("My passport", for: .normal)
+            }
+        }else{
+            DispatchQueue.main.async {
+                self.loadBtn.setTitle("Load passport", for: .normal)
+            }
+        }
+    }
+    
     override func viewDidLoad() {
     
         super.viewDidLoad()
+        
+        
         // Do any additional setup after loading the view.
         checkBtn.layer.cornerRadius = 20.0
         loadBtn.layer.cornerRadius = 20.0
