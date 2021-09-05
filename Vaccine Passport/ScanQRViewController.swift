@@ -9,8 +9,18 @@ import UIKit
 import AVFoundation
 
 
+
 class ScanQRViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate{
 
+    enum FlashPhotoMode {
+
+            case on
+            case off
+        }
+    
+    var mode = FlashPhotoMode.off
+    
+    
     @IBOutlet weak var infoStackView: UIStackView!
     @IBOutlet weak var lastDoseLbl: UILabel!
     @IBOutlet weak var yearLbl: UILabel!
@@ -19,6 +29,11 @@ class ScanQRViewController: UIViewController, AVCaptureMetadataOutputObjectsDele
     @IBOutlet weak var vaksinuarLbl: UILabel!
     @IBOutlet weak var lbl: UILabel!
 
+  
+    @IBAction func flashBtn(_ sender: UIButton) {
+        turnFlash()
+    }
+    @IBOutlet weak var flashButton: UIButton!
     @IBOutlet weak var scanBtn: UIButton!
     @IBOutlet weak var resultIcon: UIImageView!
     @IBOutlet weak var spinningIndicator: UIActivityIndicatorView!
@@ -75,7 +90,7 @@ class ScanQRViewController: UIViewController, AVCaptureMetadataOutputObjectsDele
                 failed()
                 return
             }
-
+            
             previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
             previewLayer.frame = view.layer.bounds
             previewLayer.videoGravity = .resizeAspectFill
@@ -85,12 +100,36 @@ class ScanQRViewController: UIViewController, AVCaptureMetadataOutputObjectsDele
             self.view.bringSubviewToFront(scanBtn)
             self.view.bringSubviewToFront(exitIcon)
             exitIcon.layer.cornerRadius = 8.0
-            
+            self.view.bringSubviewToFront(flashButton)
+            self.flashButton.layer.cornerRadius = 9.0
         }
+    
 @objc
 func tapFunction(sender:UITapGestureRecognizer) {
     dismiss(animated: true)
 }
+    
+    func turnFlash() {
+        guard let device = AVCaptureDevice.default(for: .video), device.hasTorch else { return }
+        
+        if device.hasTorch	 {
+            do {
+                try device.lockForConfiguration()
+                if (device.torchMode == AVCaptureDevice.TorchMode.on) {
+                    device.torchMode = AVCaptureDevice.TorchMode.off
+                                } else {
+                                    do {
+                                        try device.setTorchModeOn(level: 1.0)
+                                    } catch {
+                                        print(error)
+                                    }
+                                }
+                device.unlockForConfiguration()
+            } catch  {
+                print(error)
+            }
+        }
+    }
     
     func openSettings(alert: UIAlertAction!) {
         if let url = URL.init(string: UIApplication.openSettingsURLString) {
@@ -148,8 +187,22 @@ func tapFunction(sender:UITapGestureRecognizer) {
     
     
     func found(code: String) {
-            // Create a URLRequest for an API endpoint
+        
+        guard let device = AVCaptureDevice.default(for: .video), device.hasTorch else { return }
+        if device.hasTorch {
+            do {
+                try device.lockForConfiguration()
+                if (device.torchMode == AVCaptureDevice.TorchMode.on) {
+                    device.torchMode = AVCaptureDevice.TorchMode.off
+                                } else {
+                                }
+                device.unlockForConfiguration()
+            } catch  {
+                print(error)
+            }
+        }
         DispatchQueue.main.async {
+            self.flashButton.isHidden = true
             self.scanBtn.isHidden = true
         }
         if !code.hasPrefix("https://"){

@@ -22,6 +22,9 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
     @IBOutlet weak var nameLbl: UILabel!
     @IBOutlet weak var surnameLbl: UILabel!
     
+    @IBAction func flashBtnTouched(_ sender: UIButton) {
+        turnFlash()
+    }
     @IBOutlet weak var moreBtn: UIButton!
     @IBOutlet weak var spinningIndicator: UIActivityIndicatorView!
     @IBOutlet weak var doza1Btn: UIButton!
@@ -30,9 +33,31 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
     @IBOutlet weak var firstDoseLbl: UILabel!
     @IBOutlet weak var secondDoseLbl: UILabel!
 
+    @IBOutlet weak var flashBtn: UIButton!
     let userDefaults = UserDefaults.standard
     var captureSession: AVCaptureSession!
     var previewLayer: AVCaptureVideoPreviewLayer!
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(false)
+        
+        if (captureSession?.isRunning == false) {
+            captureSession.startRunning()
+        }
+        
+        let userExists =  UserDefaults.standard.object(forKey: "referenca") != nil
+        
+        if userExists{
+            DispatchQueue.main.async {
+                self.qrCodeImg.image = self.generateQRCode(from: UserDefaults.standard.object(forKey: "referenca") as! String)
+            }
+        }
+        
+        
+        
+    }
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -58,6 +83,7 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
             do {
                 videoInput = try AVCaptureDeviceInput(device: videoCaptureDevice)
             } catch {
+                failed()
                 return
             }
 
@@ -95,7 +121,8 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
             let interaction = UIContextMenuInteraction(delegate: self)
             moreBtn.addInteraction(interaction)
             
-            
+            self.view.bringSubviewToFront(flashBtn)
+            self.flashBtn.layer.cornerRadius = 9.0
             // Do any additional setup after loading the view.
             
             
@@ -104,6 +131,7 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
             moreBtn.addInteraction(interaction)
             let myarray = UserDefaults.standard.object(forKey: "dose1") as? [String]
             DispatchQueue.main.async {
+                self.flashBtn.isHidden = true
                 self.nameLbl.text = (UserDefaults.standard.object(forKey: "name") as! String)
                 self.surnameLbl.text = (UserDefaults.standard.object(forKey: "surname") as! String)
                 self.firstDoseLbl.text = myarray?[2] as Any as? String
@@ -133,10 +161,32 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
             self.dismiss(animated: true)
         }
     }
+    func turnFlash() {
+        guard let device = AVCaptureDevice.default(for: .video), device.hasTorch else { return }
+        
+        if device.hasTorch     {
+            do {
+                try device.lockForConfiguration()
+                if (device.torchMode == AVCaptureDevice.TorchMode.on) {
+                    device.torchMode = AVCaptureDevice.TorchMode.off
+                                } else {
+                                    do {
+                                        try device.setTorchModeOn(level: 1.0)
+                                    } catch {
+                                        print(error)
+                                    }
+                                }
+                device.unlockForConfiguration()
+            } catch  {
+                print(error)
+            }
+        }
+    }
     
     func failed() {
         captureSession = nil
         DispatchQueue.main.async {
+        
             self.hideError()
             
             let ac = UIAlertController(title: "Nuk mund te skanoni", message: "Per te skanuar duhet qasje ne kamere", preferredStyle: .alert)
@@ -150,13 +200,6 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
        
     }
 
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-
-        if (captureSession?.isRunning == false) {
-            captureSession.startRunning()
-        }
-    }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
@@ -174,19 +217,34 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
             guard let stringValue = readableObject.stringValue else { return }
             AudioServicesPlaySystemSound(SystemSoundID(1394))
             AudioServicesPlaySystemSound(systemSoundID)
-            found(code: stringValue)
+            found(code: stringValue, reload: false)
         }
        // dismiss(animated: true)
     }
     
-    func found(code: String) {
-        // Create a URLRequest for an API endpoint
-    
+    func found(code: String, reload: Bool) {
         
+        guard let device = AVCaptureDevice.default(for: .video), device.hasTorch else { return }
+        if device.hasTorch {
+            do {
+                try device.lockForConfiguration()
+                if (device.torchMode == AVCaptureDevice.TorchMode.on) {
+                    device.torchMode = AVCaptureDevice.TorchMode.off
+                                } else {
+                                }
+                device.unlockForConfiguration()
+            } catch  {
+                print(error)
+            }
+        }
+        DispatchQueue.main.async {
+            self.flashBtn.isHidden = true
+            self.scanBtn.isHidden = true
+        }
     if !code.hasPrefix("https://"){
         let alert = UIAlertController(title: "QR Code i gabuar", message: "Ju lutem skanoni QR Code ne kartelen tuaj", preferredStyle: .alert)
 
-        self.scanBtn.isHidden = true
+        
         alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: {action in
             self.dismiss(animated: true)
             self.captureSession?.stopRunning()
@@ -267,6 +325,8 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
                         DispatchQueue.main.async {
                             firstDoseLbl.text = String(vac1date)
                             secondDoseLbl.text = String(vac2date)
+                            doza2Btn.isHidden = false
+                            secondDoseLbl.isHidden = false
                         }
                     }else if jsonArray.count == 1{
                         
@@ -301,31 +361,43 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
                         self.scanBtn.isHidden = true
                         self.spinningIndicator.isHidden = true
                         
-                        let optionMenu = UIAlertController(title: "Kartela valide", message: "\nEmri: \(name) \(surname)\nNr.personal: \(nrPersonal)", preferredStyle: .actionSheet)
-                                                   
-                                               // 2
-                                            let deleteAction = UIAlertAction(title: "Mos ruaj", style: .default , handler: {action in
-                                                self.captureSession?.stopRunning()
-                                                self.previewLayer?.removeFromSuperlayer()
-                                            })
-                        let saveAction = UIAlertAction(title: "Ruaj", style: .default, handler: {action in
+                        
+                        if reload {
+                            UserDefaults.standard.set(code, forKey: "referenca")
                             UserDefaults.standard.set(name, forKey: "name")
                             UserDefaults.standard.set(surname, forKey: "surname")
                             UserDefaults.standard.set(birthdate, forKey: "birthdate")
                             UserDefaults.standard.set(nrPersonal, forKey: "nrpersonal")
-                            self.captureSession?.stopRunning()
-                            self.previewLayer?.removeFromSuperlayer()
-                            
-                        })
+                        }else{
+                            let optionMenu = UIAlertController(title: "Kartela valide", message: "\nEmri: \(name) \(surname)\nNr.personal: \(nrPersonal)", preferredStyle: .actionSheet)
+                                                       
+                                                   // 2
+                                                let deleteAction = UIAlertAction(title: "Mos ruaj", style: .default , handler: {action in
+                                                    self.captureSession?.stopRunning()
+                                                    self.previewLayer?.removeFromSuperlayer()
+                                                    dismiss(animated: true)
+                                                })
+                            let saveAction = UIAlertAction(title: "Ruaj", style: .default, handler: {action in
+                                UserDefaults.standard.set(code, forKey: "referenca")
+                                UserDefaults.standard.set(name, forKey: "name")
+                                UserDefaults.standard.set(surname, forKey: "surname")
+                                UserDefaults.standard.set(birthdate, forKey: "birthdate")
+                                UserDefaults.standard.set(nrPersonal, forKey: "nrpersonal")
+                                self.captureSession?.stopRunning()
+                                self.previewLayer?.removeFromSuperlayer()
+                                
+                            })
 
-                                               optionMenu.addAction(deleteAction)
-                                               optionMenu.addAction(saveAction)
+                            optionMenu.addAction(deleteAction)
+                            optionMenu.addAction(saveAction)
 
-                                               // 5
-                                               self.present(optionMenu, animated: true, completion: nil)
+                            self.present(optionMenu, animated: true, completion: nil)
+                        }
+                        
+                        
                         self.nameLbl.text = name
                         self.surnameLbl.text = surname
- 
+
                     }
 
                     
@@ -373,6 +445,7 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
 
     func hideError(){
         DispatchQueue.main.async {
+            self.moreBtn.isHidden = true
             self.qrCodeImg.isHidden = true
             self.nameLbl.isHidden = true
             self.spinningIndicator.isHidden = true
@@ -429,6 +502,27 @@ extension PassportViewController: UIContextMenuInteractionDelegate {
         dismiss(animated: true)
     }
     
+    func reloadMenu() -> UIAction {
+      
+   
+      let reloadImg = UIImage(systemName: "arrow.clockwise")
+      
+      // 4
+      return UIAction(
+        title: "Perditesoj informatat",
+        image: reloadImg,
+        identifier: nil,
+        handler: reloadInfo)
+    }
+    
+    func reloadInfo(from action: UIAction){
+        let referenca = UserDefaults.standard.object(forKey: "referenca")
+        let domain = Bundle.main.bundleIdentifier!
+        UserDefaults.standard.removePersistentDomain(forName: domain)
+        UserDefaults.standard.synchronize()
+        found(code: referenca as! String, reload: true)
+    }
+    
     func screenShotMenu() -> UIAction {
     let shareImg = UIImage(systemName: "square.and.arrow.up")
       
@@ -465,7 +559,8 @@ extension PassportViewController: UIContextMenuInteractionDelegate {
       actionProvider: { _ in
         let delete = makeDeleteInfo()
         let share = screenShotMenu()
-        let children = [delete, share]
+        let reload = reloadMenu()
+        let children = [delete, reload, share]
         return UIMenu(title: "Pasaporta e vaksinimit", children: children)
     })
   }

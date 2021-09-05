@@ -94,7 +94,7 @@
         <!--ScanQR View Controller-->
         <scene sceneID="zLz-ya-SPN">
             <objects>
-                <viewController id="erz-ZR-2zU" customClass="ScanQRViewController" customModule="Vaccine_Passport" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="scanView" useStoryboardIdentifierAsRestorationIdentifier="YES" id="erz-ZR-2zU" customClass="ScanQRViewController" customModule="Vaccine_Passport" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="l91-cw-kDX">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="842"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -208,12 +208,24 @@
                                     <constraint firstAttribute="width" constant="45" id="nAH-wN-EEO"/>
                                 </constraints>
                             </imageView>
+                            <button opaque="NO" alpha="0.84999999999999998" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lPK-Wf-tXp">
+                                <rect key="frame" x="154" y="733" width="107" height="45"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="45" id="lts-zk-BbE"/>
+                                </constraints>
+                                <state key="normal" title="Flash"/>
+                                <connections>
+                                    <action selector="flashBtn:" destination="erz-ZR-2zU" eventType="touchUpInside" id="rF4-JR-iEC"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="lhB-YK-xat"/>
                         <color key="backgroundColor" systemColor="systemGray5Color"/>
                         <constraints>
                             <constraint firstItem="lhB-YK-xat" firstAttribute="trailing" secondItem="Wxc-hl-Ga1" secondAttribute="trailing" constant="15" id="2iW-RN-U9B"/>
                             <constraint firstItem="3iZ-TL-XT6" firstAttribute="top" secondItem="eNS-2d-Jtg" secondAttribute="bottom" constant="30" id="8m8-pS-voP"/>
+                            <constraint firstItem="lhB-YK-xat" firstAttribute="trailing" secondItem="lPK-Wf-tXp" secondAttribute="trailing" constant="153" id="B7g-dt-vtd"/>
                             <constraint firstItem="eNS-2d-Jtg" firstAttribute="top" secondItem="4t3-Cn-Y6U" secondAttribute="bottom" constant="25" id="BaD-vw-etp"/>
                             <constraint firstItem="lhB-YK-xat" firstAttribute="trailing" secondItem="2Pp-Rr-ZhK" secondAttribute="trailing" id="Bth-4q-Zh3"/>
                             <constraint firstItem="eNS-2d-Jtg" firstAttribute="leading" secondItem="lhB-YK-xat" secondAttribute="leading" id="HTQ-gv-x8t"/>
@@ -226,7 +238,9 @@
                             <constraint firstItem="3iZ-TL-XT6" firstAttribute="leading" secondItem="lhB-YK-xat" secondAttribute="leading" id="UKI-ks-t0o"/>
                             <constraint firstItem="2Pp-Rr-ZhK" firstAttribute="leading" secondItem="lhB-YK-xat" secondAttribute="leading" id="YXx-ue-Rwi"/>
                             <constraint firstItem="lhB-YK-xat" firstAttribute="bottom" secondItem="2Pp-Rr-ZhK" secondAttribute="bottom" constant="40" id="b6F-hw-QP3"/>
+                            <constraint firstItem="lPK-Wf-tXp" firstAttribute="leading" secondItem="lhB-YK-xat" secondAttribute="leading" constant="154" id="cJG-pH-YwH"/>
                             <constraint firstItem="Wxc-hl-Ga1" firstAttribute="top" secondItem="lhB-YK-xat" secondAttribute="top" constant="15" id="hY2-HY-ukq"/>
+                            <constraint firstItem="lhB-YK-xat" firstAttribute="bottom" secondItem="lPK-Wf-tXp" secondAttribute="bottom" constant="30" id="iRJ-ZK-5zF"/>
                             <constraint firstItem="4t3-Cn-Y6U" firstAttribute="leading" secondItem="lhB-YK-xat" secondAttribute="leading" constant="123" id="p1W-o9-Ak7"/>
                             <constraint firstItem="lhB-YK-xat" firstAttribute="trailing" secondItem="eNS-2d-Jtg" secondAttribute="trailing" id="su2-4L-FVE"/>
                             <constraint firstItem="4t3-Cn-Y6U" firstAttribute="top" secondItem="lhB-YK-xat" secondAttribute="top" constant="60" id="wP3-oE-h6N"/>
@@ -236,6 +250,7 @@
                     <connections>
                         <outlet property="emriLbl" destination="ehB-xx-ZmF" id="hde-6s-UpI"/>
                         <outlet property="exitIcon" destination="Wxc-hl-Ga1" id="MDM-TO-YKY"/>
+                        <outlet property="flashButton" destination="lPK-Wf-tXp" id="cWE-Xf-SOE"/>
                         <outlet property="infoStackView" destination="xPF-1c-FbX" id="JTG-HZ-vdu"/>
                         <outlet property="lastDoseLbl" destination="qdO-7k-1t6" id="crS-YP-kka"/>
                         <outlet property="lbl" destination="eNS-2d-Jtg" id="evM-Uw-u6t"/>
@@ -465,6 +480,18 @@
                                 <rect key="frame" x="183" y="773" width="48" height="30"/>
                                 <state key="normal" title="More..."/>
                             </button>
+                            <button opaque="NO" alpha="0.85000002384185791" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qac-fa-bF1">
+                                <rect key="frame" x="150" y="698" width="115" height="45"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="45" id="1fN-t5-syP"/>
+                                </constraints>
+                                <state key="normal" title="Flash"/>
+                                <connections>
+                                    <action selector="flashBtn:" destination="erz-ZR-2zU" eventType="touchUpInside" id="iVO-RP-ZOI"/>
+                                    <action selector="flashBtnTouched:" destination="JV8-hO-YMc" eventType="touchUpInside" id="0R1-gI-uqQ"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="QQw-Ec-cqG"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -475,6 +502,8 @@
                             <constraint firstItem="nGz-FA-3hA" firstAttribute="leading" secondItem="QQw-Ec-cqG" secondAttribute="leading" id="AsT-Do-mqN"/>
                             <constraint firstItem="hTg-Tu-7gq" firstAttribute="top" secondItem="FSk-22-VS8" secondAttribute="bottom" constant="16" id="Azx-QW-irI"/>
                             <constraint firstItem="QQw-Ec-cqG" firstAttribute="trailing" secondItem="hTg-Tu-7gq" secondAttribute="trailing" constant="80" id="D80-nV-yeX"/>
+                            <constraint firstItem="fpS-b7-0Sj" firstAttribute="top" secondItem="qac-fa-bF1" secondAttribute="bottom" constant="30" id="DGP-jC-3gL"/>
+                            <constraint firstItem="qac-fa-bF1" firstAttribute="leading" secondItem="QQw-Ec-cqG" secondAttribute="leading" constant="150" id="E9c-kn-auf"/>
                             <constraint firstItem="nGz-FA-3hA" firstAttribute="top" secondItem="hTg-Tu-7gq" secondAttribute="bottom" constant="10" id="FFs-J5-nZe"/>
                             <constraint firstItem="FSk-22-VS8" firstAttribute="leading" secondItem="QQw-Ec-cqG" secondAttribute="leading" id="IMa-FM-37D"/>
                             <constraint firstItem="QQw-Ec-cqG" firstAttribute="trailing" secondItem="w9Z-gg-qkC" secondAttribute="trailing" constant="80" id="KBB-1S-QMb"/>
@@ -493,6 +522,7 @@
                             <constraint firstItem="hTg-Tu-7gq" firstAttribute="leading" secondItem="QQw-Ec-cqG" secondAttribute="leading" constant="80" id="dha-00-52N"/>
                             <constraint firstItem="N0Y-wo-r2H" firstAttribute="leading" secondItem="QQw-Ec-cqG" secondAttribute="leading" constant="82" id="gpD-aA-qYW"/>
                             <constraint firstItem="FSk-22-VS8" firstAttribute="trailing" secondItem="QQw-Ec-cqG" secondAttribute="trailing" id="ln9-uz-DWg"/>
+                            <constraint firstItem="QQw-Ec-cqG" firstAttribute="trailing" secondItem="qac-fa-bF1" secondAttribute="trailing" constant="149" id="p5e-MW-hB9"/>
                             <constraint firstItem="QQw-Ec-cqG" firstAttribute="trailing" secondItem="Qfl-MT-M5t" secondAttribute="trailing" constant="80" id="pfX-1n-wiC"/>
                             <constraint firstItem="w9Z-gg-qkC" firstAttribute="leading" secondItem="QQw-Ec-cqG" secondAttribute="leading" constant="80" id="t1o-f1-6nn"/>
                             <constraint firstItem="N0Y-wo-r2H" firstAttribute="top" secondItem="w9Z-gg-qkC" secondAttribute="bottom" constant="30" id="tRG-Hg-iHd"/>
@@ -508,6 +538,7 @@
                         <outlet property="emriMbiemriBtn" destination="S6c-Jk-ss6" id="KcH-Zy-Xbd"/>
                         <outlet property="exitIcon" destination="1cD-go-dgA" id="Wdk-Qj-yWj"/>
                         <outlet property="firstDoseLbl" destination="FSk-22-VS8" id="98Q-Jr-0cv"/>
+                        <outlet property="flashBtn" destination="qac-fa-bF1" id="r01-Ke-dp7"/>
                         <outlet property="moreBtn" destination="fpS-b7-0Sj" id="7xF-pX-cvv"/>
                         <outlet property="nameLbl" destination="vdb-9P-H6c" id="NKM-zH-ds3"/>
                         <outlet property="qrCodeImg" destination="N0Y-wo-r2H" id="jac-0C-Gv9"/>
