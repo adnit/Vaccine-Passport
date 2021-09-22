@@ -239,7 +239,7 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
         }
         DispatchQueue.main.async {
             self.flashBtn.isHidden = true
-            self.scanBtn.isHidden = true
+            // self.scanBtn.isHidden = true
         }
     if !code.hasPrefix("https://"){
         let alert = UIAlertController(title: "QR Code i gabuar", message: "Ju lutem skanoni QR Code ne kartelen tuaj", preferredStyle: .alert)
@@ -279,8 +279,12 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
             if myResponse.statusCode == 200 {
                 do{
                     let jsonResponse = try JSONSerialization.jsonObject(with: data!, options: [])
-                    print(jsonResponse) //Response result
-                    guard let jsonArray = jsonResponse as? [[String: Any]] else { return }
+                    print("cool") //Response result
+                    // guard let jsonArray = jsonResponse as? [[String: Any]] else { return }
+                    
+                    let object = jsonResponse as? [String: Any]
+                    let data = object?["data"] as? [[String: Any]]
+                    guard let jsonArray = data?[0]["immunization"] as? [[String: Any]] else { return }
                     
                     DispatchQueue.main.async {
                         qrCodeImg.image = generateQRCode(from: code)
