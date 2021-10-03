@@ -7,10 +7,12 @@
 
 import UIKit
 import AVFoundation
-
+import Foundation
+import SwiftSoup
 
 
 class ScanQRViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate{
+    var reqToken = "1"
 
     enum FlashPhotoMode {
 
@@ -186,6 +188,22 @@ func tapFunction(sender:UITapGestureRecognizer) {
         }
     
     
+    func getToken(url: URL) -> String{
+        do{
+            let html = try String(contentsOf: url)
+            let document = try SwiftSoup.parse(html)
+
+            // print(document)
+
+            let reqTokenItem = try document.select("[name=__RequestVerificationToken]").first()!
+            let result = try reqTokenItem.val()
+            return result
+        }catch{
+            return "Error"
+        }
+        
+    }
+    
     func found(code: String) {
         
         guard let device = AVCaptureDevice.default(for: .video), device.hasTorch else { return }
@@ -205,7 +223,7 @@ func tapFunction(sender:UITapGestureRecognizer) {
             self.flashButton.isHidden = true
             self.scanBtn.isHidden = true
         }
-        if !code.hasPrefix("https://"){
+        if !(code.hasPrefix("https://ekosova.rks-gov.net") || code.hasPrefix("http://ekosova.rks-gov.net") || code.hasPrefix("ekosova.rks-gov.net")) {
             DispatchQueue.main.async {
                 self.vaksinuarLbl.text = "QR Code i gabuar"
                 let image = UIImage(systemName: "xmark.circle.fill")
@@ -221,7 +239,7 @@ func tapFunction(sender:UITapGestureRecognizer) {
         }
         guard let url = URLComponents(string: code) else { return }
         guard let reference = url.queryItems?.first(where: { $0.name == "code" })?.value else { return}
-                // 36 karaktere
+                // 36 karaktere 
         
             DispatchQueue.main.async {
                 self.vaksinuarLbl.text = "Duke kerkuar"
@@ -238,6 +256,16 @@ func tapFunction(sender:UITapGestureRecognizer) {
             var request = URLRequest(url: rurl!)
                     // Specify HTTP Method to use
             request.httpMethod = "GET"
+        
+        // let surl = URL(string: code)!
+
+        // let reqToken = getToken(url: surl)
+        let reqToken = "CfDJ8DxWiKK55mtEsZ8q1sj1IJctkibo9afRlY4FcSR_M6PSGWgn7gyUWpwougW0A-fqADpKWEDLwJrC68s4X304Ws9raWu6yXa-H1eCzNfUg5fxiFnrgrgWjd6Apbs3wcv3dYDJKHCdHTe7tt7ByDbxE1o"
+        let cookie = ".AspNetCore.Antiforgery.sfP6sknPLHg=CfDJ8DxWiKK55mtEsZ8q1sj1IJcesNP3iqbmBSCQDPcrN3cu_vhsYOHCMJEBF6jqnT1jJjmWZjUozo1qXuS27o82rHJjishAig53h8PwM6q1CEzCPx43uCyRjjV52Lmi_n7VkL04frQH28tL9JNVts4IcH4; lang=sq-al"
+        
+        request.addValue(reqToken, forHTTPHeaderField: "RequestVerificationToken")
+        request.addValue(cookie, forHTTPHeaderField: "Cookie")
+   
             let task = URLSession.shared.dataTask(with: request) { [self](data, response, error) in
                       guard let response = response else {
                         print("Cannot found the response")
@@ -298,6 +326,8 @@ func tapFunction(sender:UITapGestureRecognizer) {
                         infoStackView.isHidden = true
                         spinningIndicator.isHidden = true
                     }
+                }else{
+                    print(myResponse.statusCode)
                 }
                 
                     }

@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6104B3ED270A524E001021CD /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 6104B3EC270A524E001021CD /* SwiftSoup */; };
 		612BDD0D26DAD74A0030CD60 /* PaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 612BDD0C26DAD74A0030CD60 /* PaddingLabel.swift */; };
 		612BDD1126DB00240030CD60 /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 612BDD1026DB00240030CD60 /* InfoViewController.swift */; };
 		612BDD1326DBAAA30030CD60 /* PassportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 612BDD1226DBAAA20030CD60 /* PassportViewController.swift */; };
@@ -41,6 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6104B3ED270A524E001021CD /* SwiftSoup in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -98,6 +100,9 @@
 			dependencies = (
 			);
 			name = "Vaccine Passport";
+			packageProductDependencies = (
+				6104B3EC270A524E001021CD /* SwiftSoup */,
+			);
 			productName = "Vaccine Passport";
 			productReference = 6181293226D90F7F0047A12F /* Vaccine Passport.app */;
 			productType = "com.apple.product-type.application";
@@ -125,6 +130,9 @@
 				Base,
 			);
 			mainGroup = 6181292926D90F7F0047A12F;
+			packageReferences = (
+				6104B3EB270A524E001021CD /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+			);
 			productRefGroup = 6181293326D90F7F0047A12F /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -363,6 +371,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		6104B3EB270A524E001021CD /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6104B3EC270A524E001021CD /* SwiftSoup */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6104B3EB270A524E001021CD /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			productName = SwiftSoup;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6181292A26D90F7F0047A12F /* Project object */;
 }

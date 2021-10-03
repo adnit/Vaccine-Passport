@@ -241,7 +241,7 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
             self.flashBtn.isHidden = true
             // self.scanBtn.isHidden = true
         }
-    if !code.hasPrefix("https://"){
+        if !(code.hasPrefix("https://ekosova.rks-gov.net") || code.hasPrefix("http://ekosova.rks-gov.net") || code.hasPrefix("ekosova.rks-gov.net")){
         let alert = UIAlertController(title: "QR Code i gabuar", message: "Ju lutem skanoni QR Code ne kartelen tuaj", preferredStyle: .alert)
 
         
@@ -270,6 +270,11 @@ class PassportViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
         var request = URLRequest(url: rurl!)
                 // Specify HTTP Method to use
         request.httpMethod = "GET"
+        let reqToken = "CfDJ8DxWiKK55mtEsZ8q1sj1IJctkibo9afRlY4FcSR_M6PSGWgn7gyUWpwougW0A-fqADpKWEDLwJrC68s4X304Ws9raWu6yXa-H1eCzNfUg5fxiFnrgrgWjd6Apbs3wcv3dYDJKHCdHTe7tt7ByDbxE1o"
+        let cookie = ".AspNetCore.Antiforgery.sfP6sknPLHg=CfDJ8DxWiKK55mtEsZ8q1sj1IJcesNP3iqbmBSCQDPcrN3cu_vhsYOHCMJEBF6jqnT1jJjmWZjUozo1qXuS27o82rHJjishAig53h8PwM6q1CEzCPx43uCyRjjV52Lmi_n7VkL04frQH28tL9JNVts4IcH4; lang=sq-al"
+        
+        request.addValue(reqToken, forHTTPHeaderField: "RequestVerificationToken")
+        request.addValue(cookie, forHTTPHeaderField: "Cookie")
         let task = URLSession.shared.dataTask(with: request) { [self](data, response, error) in
                   guard let response = response else {
                     print("Cannot found the response")
@@ -505,7 +510,29 @@ extension PassportViewController: UIContextMenuInteractionDelegate {
         UserDefaults.standard.synchronize()
         dismiss(animated: true)
     }
+          
+          func openBrowser(from action: UIAction){
+              let ref = UserDefaults.standard.object(forKey: "referenca") as! String
+              guard let url = URL(string: ref) else {
+                   return
+              }
+
+              if UIApplication.shared.canOpenURL(url) {
+                   UIApplication.shared.open(url, options: [:], completionHandler: nil)
+              }
+          }
     
+          func openinBrowser() -> UIAction {
+              let browser = UIImage(systemName: "safari")
+              
+              // 4
+              return UIAction(
+                title: "Hape pasaporten ne browser",
+                image: browser,
+                identifier: nil,
+                handler: openBrowser)
+          }
+          
     func reloadMenu() -> UIAction {
       
    
@@ -564,7 +591,8 @@ extension PassportViewController: UIContextMenuInteractionDelegate {
         let delete = makeDeleteInfo()
         let share = screenShotMenu()
         let reload = reloadMenu()
-        let children = [delete, reload, share]
+        let openinBrowser = openinBrowser()
+        let children = [delete, reload, openinBrowser, share]
         return UIMenu(title: "Pasaporta e vaksinimit", children: children)
     })
   }
